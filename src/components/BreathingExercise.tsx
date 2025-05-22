@@ -66,12 +66,23 @@ const BreathingExercise: React.FC<BreathingExerciseProps> = ({
     }
   };
   
+  const lastTimeRef = useRef<number>(0);
+
   // Animation function using requestAnimationFrame
-  const animate = useCallback(() => {
+  const animate = useCallback((timestamp: number) => {
     if (isPaused || !circleRef.current) return;
     
-    // Update breath timer
-    breathTimerRef.current += 1/60; // Assuming 60fps
+    // 首次运行时初始化lastTime
+    if (lastTimeRef.current === 0) {
+      lastTimeRef.current = timestamp;
+    }
+    
+    // 计算实际的时间差（秒）
+    const deltaTime = (timestamp - lastTimeRef.current) / 1000;
+    lastTimeRef.current = timestamp;
+    
+    // 使用实际时间差更新呼吸计时器
+    breathTimerRef.current += deltaTime;
     
     const circle = circleRef.current;
     
